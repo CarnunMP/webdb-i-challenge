@@ -7,11 +7,22 @@ const server = express();
 server.use(express.json());
 
 server.get('/accounts', (req, res) => {
-  db('accounts')
-    .then(accounts => {
-      res.status(200).json(accounts);
-    })
-    .catch(err => genericError(err, res));
+  const { query } = req;
+  const { limit, sortBy, sortDir } = query;
+
+  if (!limit || !sortBy || !sortDir) {
+    db('accounts')
+      .then(accounts => {
+        res.status(200).json(accounts);
+      })
+      .catch(err => genericError(err, res));
+  } else {
+    db('accounts').orderBy(sortBy, sortDir).limit(limit)
+      .then(accounts => {
+        res.status(200).json(accounts);
+      })
+      .catch(err => genericError(err, res));
+  }
 });
 
 server.get('/accounts/:id', (req, res) => {
