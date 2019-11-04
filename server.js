@@ -42,6 +42,19 @@ server.post('/accounts', (req, res) => {
   }
 });
 
+server.put('/accounts/:id', (req, res) => {
+  const { body } = req;
+  const { id } = req.params;
+
+  db('accounts').where({ id }).update(body)
+    .then(count => {
+      res.status(201).json({
+        message: `Successfully updated ${count} rows.`,
+      });
+    })
+    .catch(err => genericError(err, res));
+});
+
 function genericError(err, res) {
   return res.status(500).json({
     message: "Error: " + err.message,
