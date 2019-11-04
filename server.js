@@ -55,6 +55,18 @@ server.put('/accounts/:id', (req, res) => {
     .catch(err => genericError(err, res));
 });
 
+server.delete('/accounts/:id', (req, res) => {
+  const { id } = req.params;
+
+  db('accounts').where({ id }).del()
+    .then(count => {
+      res.status(200).json({
+        message: `Successfully deleted ${count} rows.`,
+      });
+    })
+    .catch(err => genericError(err, res));
+});
+
 function genericError(err, res) {
   return res.status(500).json({
     message: "Error: " + err.message,
