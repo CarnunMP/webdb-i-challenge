@@ -11,7 +11,7 @@ server.get('/accounts', (req, res) => {
     .then(accounts => {
       res.status(200).json(accounts);
     })
-    .catch(err => genericError(err));
+    .catch(err => genericError(err, res));
 });
 
 server.get('/accounts/:id', (req, res) => {
@@ -21,10 +21,28 @@ server.get('/accounts/:id', (req, res) => {
     .then(accounts => {
       res.status(200).json(accounts);
     })
-    .catch(err => genericError(err));
+    .catch(err => genericError(err, res));
 });
 
-function genericError(err) {
+server.post('/accounts', (req, res) => {
+  const { body } = req;
+
+  if (!body || !body.name || !body.budget) {
+    res.status(400).json({
+      message: "Request body must include name [String] and budget [Float] fields."
+    });
+  } else {
+    db('accounts').insert(body)
+      .then(idArray => {
+        res.status(201).json({
+          message: "Successfully created a new acount with an id of " + idArray[0],
+        });
+      })
+      .catch(err => genericError(err, res));
+  }
+});
+
+function genericError(err, res) {
   return res.status(500).json({
     message: "Error: " + err.message,
   });
